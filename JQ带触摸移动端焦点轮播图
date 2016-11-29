@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="applicable-device" content="mobile">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="wap-font-scale" content="no">
+	<title>家校互动平台</title>
+<!-- <link rel="stylesheet" type="text/css" href="css/reset.css"> -->
+<!-- <link rel="stylesheet" type="text/css" href="css/index.css"> -->
+<style type="text/css">
+body,h1,h2,h3,h4,h5,h6,hr,p,blockquote,dl,dt,dd,ul,ol,li,pre,figcaption,figure,fieldset,legend,button,input,textarea,th,td{margin:0;padding:0}
+h1{font-size:18px;font-weight:normal}
+h2{font-size:14px;font-weight:normal}
+h3{font-size:14px;font-weight:normal}
+h4,h5,h6{font-size:100%;font-weight:normal}
+ul,ol,li{list-style:none}
+a{text-decoration:none}
+abbr[title],acronym[title]{border-bottom:1px dotted;cursor:help}
+q:before,q:after{content:''}
+legend{color:#000}
+fieldset,img{border:0}
+table{border-collapse:collapse;border-spacing:0}
+hr{border:0;height:1px}
+body>iframe{display:none !important;}
+*{-ms-word-break:break-all;word-break:break-all;-ms-word-wrap:break-word;word-wrap:break-word;-webkit-tap-highlight-color:rgba(0,0,0,0)}
+html {
+    font-family: 'sans-serif',"微软雅黑", "Microsoft YaHei",  "Tahoma", "Helvetica";
+    font-size: 12px;
+    background: #fff  left top repeat-y;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.banner{display:none}
+.focus span{width:10px;height:10px;margin-right:10px;border-radius:50%;background:#666;font-size:0}
+.focus span.current{background:#fff}
+</style>
+</head>
+<body style="max-width:800px !important;margin:0px auto; ">
+
+	<div class="banner">
+		<ul>
+		    <li><a href="#" target="_blank"><img src="http://www.7wanl.com/data/attachment/portal/201611/22/150741xlq2crzukr47k2xp.jpg.max.jpg"></a></li>
+			<li><a href="#" target="_blank"><img src="http://www.7wanl.com/data/attachment/portal/201611/22/135239afw3kco4haqcc4ar.jpg.max.jpg"></a></li>
+			<li><a href="#" target="_blank"><img src="http://www.7wanl.com/data/attachment/portal/201611/22/113958mqdtoz9qog6tuqz2.jpg.max.jpg"></a></li>
+		</ul>
+	</div>
+
+</body>
+<script type="text/javascript" src="http://www.internetke.com/jsEffects/2014052304/js/jquery.min.js"></script>
+
+<script type="text/javascript">
+(function($){
+    $.fn.slider = function(settings){
+        var defaultSettings = {
+        	//不带参数时默认的值
+            width: 640,
+            height: 320,
+            during: 5000, 
+            speed:30 
+        }
+        settings = $.extend(true, {}, defaultSettings, settings);
+        return this.each(function(){
+            var _this = $(this), s = settings;
+            var startX = 0, startY = 0; //触摸开始时手势横纵坐标 
+            var temPos; 				//滚动元素当前位置
+            var iCurr = 0; 				//当前滚动屏幕数
+            var timer = null; 			//计时器
+            var oMover = $("ul", _this);//滚动元素
+            var oLi = $("li", oMover); 	//滚动单元
+            var num = oLi.length; 		//滚动屏幕数
+            var oPosition = {}; 		//触点位置
+            var moveWidth = s.width; 	//滚动宽度
+            //初始化主体样式
+            _this.width(s.width).height(s.height).css({
+                position: 'relative',
+                overflow: 'hidden',
+				margin:'0 auto'
+            }); 
+            //设定容器宽高及样式
+            oMover.css({
+                position: 'absolute',
+                left: 0
+            });
+            oLi.css({
+                float: 'left',
+                display: 'inline'
+            });
+            $("img", oLi).css({
+                width: '100%',
+                height: '100%'
+            });
+            //初始化焦点容器及按钮
+            _this.append('<div class="focus"><div></div></div>');
+            var oFocusContainer = $(".focus");
+            for (var i = 0; i < num; i++) {
+                $("div", oFocusContainer).append("<span></span>");
+            }
+            var oFocus = $("span", oFocusContainer);
+            oFocusContainer.css({
+                minHeight: $(this).find('span').height() * 2,
+                position: 'absolute',
+                bottom: 0,
+                background: 'rgba(0,0,0,0.5)'
+            })
+            $("span", oFocusContainer).css({
+                display: 'block',
+                float: 'left',
+                cursor: 'pointer'
+            })
+            $("div", oFocusContainer).width(oFocus.outerWidth(true) * num).css({
+                position: 'absolute',
+                right: 10,
+                top: '50%',
+                marginTop: -$(this).find('span').width() / 2
+            });
+            oFocus.first().addClass("current");
+ 
+            $(window).bind('resize load', function(){
+                if (isMobile()) {
+                    mobileSettings();
+                    bindTochuEvent();
+                }
+                oLi.width(_this.width()).height(_this.height());
+                oMover.width(num * oLi.width());
+                oFocusContainer.width(_this.width()).height(_this.height() * 0.15).css({
+                    zIndex: 2
+                });
+                _this.fadeIn(300);
+            });
+            
+            autoMove();
+            
+            if (!isMobile()) {
+                oFocus.hover(function(){
+                    iCurr = $(this).index() - 1;
+                    stopMove();
+                    doMove();
+                }, function(){
+                    autoMove();
+                })
+            }
+            
+            function autoMove(){
+                timer = setInterval(doMove, s.during);
+            }
+            
+            function stopMove(){
+                clearInterval(timer);
+            }
+            
+            function doMove(){
+                iCurr = iCurr >= num - 1 ? 0 : iCurr + 1;
+                doAnimate(-moveWidth * iCurr);
+                oFocus.eq(iCurr).addClass("current").siblings().removeClass("current");
+            }
+            //绑定触摸事件
+            function bindTochuEvent(){
+                oMover.get(0).addEventListener('touchstart', touchStartFunc, false);
+                oMover.get(0).addEventListener('touchmove', touchMoveFunc, false);
+                oMover.get(0).addEventListener('touchend', touchEndFunc, false);
+            }
+            //获取触点位置
+            function touchPos(e){
+                var touches = e.changedTouches, touch, tagX, tagY;
+                for (var i = 0; i < touches.length; i++) {
+                    touch = touches[i];
+                    tagX = touch.clientX;
+                    tagY = touch.clientY;
+                }
+                oPosition.x = tagX;
+                oPosition.y = tagY;
+                return oPosition;
+            }
+            //触摸开始
+            function touchStartFunc(e){
+                clearInterval(timer);
+                touchPos(e);
+                startX = oPosition.x;
+                startY = oPosition.y;
+                temPos = oMover.position().left;
+            }
+            //触摸移动 
+            function touchMoveFunc(e){
+                touchPos(e);
+                var moveX = oPosition.x - startX;
+                var moveY = oPosition.y - startY;
+                if (Math.abs(moveY) < Math.abs(moveX)) {
+                    e.preventDefault();
+                    oMover.css({
+                        left: temPos + moveX
+                    });
+                }
+            }
+            //触摸结束
+            function touchEndFunc(e){
+                touchPos(e);
+                var moveX = oPosition.x - startX;
+                var moveY = oPosition.y - startY;
+                if (Math.abs(moveY) < Math.abs(moveX)) {
+                    if (moveX > 0) {
+                        iCurr--;
+                        if (iCurr >= 0) {
+                            var moveX = iCurr * moveWidth;
+                            doAnimate(-moveX, autoMove);
+                        }
+                        else {
+                            doAnimate(0, autoMove);
+                            iCurr = 0;
+                        }
+                    }else {
+                        iCurr++;
+                        if (iCurr < num && iCurr >= 0) {
+                            var moveX = iCurr * moveWidth;
+                            doAnimate(-moveX, autoMove);
+                        }
+                        else {
+                            iCurr = num - 1;
+                            doAnimate(-(num - 1) * moveWidth, autoMove);
+                        }
+                    }
+                    oFocus.eq(iCurr).addClass("current").siblings().removeClass("current");
+                }
+            }
+            //移动设备基于屏幕宽度设置容器宽高
+            function mobileSettings(){
+                moveWidth = $(window).width();
+                var iScale = $(window).width() / s.width;
+                _this.height(s.height * iScale).width($(window).width());
+                oMover.css({
+                    left: -iCurr * moveWidth
+                });
+            }
+            //动画效果
+            function doAnimate(iTarget, fn){
+                oMover.stop().animate({
+                    left: iTarget
+                }, _this.speed , function(){
+                    if (fn){
+                    	fn();
+                    }
+                });
+            }
+            //判断是否是移动设备
+            function isMobile(){
+                if (navigator.userAgent.match(/Android/i) || navigator.userAgent.indexOf('iPhone') != -1 || navigator.userAgent.indexOf('iPod') != -1 || navigator.userAgent.indexOf('iPad') != -1) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        });
+    }
+})(jQuery);
+
+$(".banner").slider()
+</script>
+</html>
