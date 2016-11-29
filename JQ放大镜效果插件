@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+<style type="text/css">
+.minWrap{
+	width: 350px;
+	height: 350px;
+	border: 1px solid #ccc;
+	
+}
+.minWrap img{
+	width: 350px;
+	height: 350px;
+}	
+.slider{
+	height: 105px;
+	width: 105px;
+	background-color: yellow;
+	opacity: 0.3;
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: none;
+}
+.maxWrap{
+	display: none;
+	position: absolute;
+	left: 370px;
+	width: 400px;
+	height: 400px;
+	border: 1px solid #ccc;
+	overflow: hidden;
+	top: 8px;
+}
+.maxWrap img{
+	position: absolute;
+}
+</style>
+</head>
+<body>
+<img class="jj1" src="http://www.7wanl.com/data/attachment/portal/201611/22/135239afw3kco4haqcc4ar.jpg.max.jpg" alt="">
+
+<img class="jj2" src="http://www.7wanl.com/data/attachment/portal/201611/22/150741xlq2crzukr47k2xp.jpg.max.jpg" alt="">
+
+<img class="jj3" src="http://www.7wanl.com/data/attachment/portal/201611/22/113958mqdtoz9qog6tuqz2.jpg.max.jpg" alt="">
+
+<script type="text/javascript" src="http://www.internetke.com/jsEffects/2014052304/js/jquery.min.js"></script>
+<script type="text/javascript">
+$.fn.extend({
+	Magnifier: function(){
+
+		// $link = $("<link rel='stylesheet' href=''>");
+		// $link.attr("href","css/fang.css");
+
+		// $("head:eq(0)").append($link);
+
+		//创建结构
+		var $wrap = "<div class='all' style='clear:both;position: relative;'><div class='minWrap'>"+
+						"<img class='"+$(this).attr("class")+"' src='"+$(this).attr("src")+"' alt=''>"+
+						"<div class='slider'></div>" + 
+					"</div>" + 
+					"<div class='maxWrap'>" + 
+						"<img src='"+$(this).attr("src")+"' alt=''>"+
+					"</div></div>";
+
+		$(this).after($wrap);
+
+		$(this).remove();
+
+		//处理逻辑
+		var _this = $("."+$(this).attr("class"));
+		_this.parent().mouseenter(function(event){
+
+			var maxWrap = _this.parent().siblings('.maxWrap');
+			var slider = _this.siblings('.slider')
+
+			slider.show();
+			maxWrap.show();
+
+			_this.parent().mousemove(function (event){
+				var x = event.pageX - _this.parent().offset().left - slider.width()/2;
+				var y = event.pageY - _this.parent().offset().top - slider.height()/2;
+
+				if(x<0){
+					x = 0;
+				}else if(x > _this.parent().innerWidth() - slider.width()){
+					x = _this.parent().innerWidth() - slider.width()
+				}
+
+				if(y<0){
+					y=0;
+				}else if(y> _this.parent().innerHeight() - slider.height()){
+					y = _this.parent().innerHeight() - slider.height();
+				}
+
+				var scaleX = x/(_this.parent().innerWidth() - slider.width());
+				var scaleY = y/(_this.parent().innerHeight()- slider.height());
+
+				_this.siblings('.slider').css({
+					left:x,
+					top:y
+				})
+
+				$(maxWrap).children('img:eq(0)').css({
+					left:-scaleX*( $(maxWrap).children('img:eq(0)').width() - maxWrap.width() ),
+					top:-scaleY*( $(maxWrap).children('img:eq(0)').height() - maxWrap.height() )
+				})
+
+			});
+		});
+		_this.parent().mouseleave(function(event) {
+			_this.siblings('.slider').hide();
+			_this.parent().siblings('.maxWrap').hide();
+		})
+	}
+})
+
+$(function (){
+	$(".jj1").Magnifier();
+	$(".jj2").Magnifier();
+	$(".jj3").Magnifier();
+})
+</script>
+</body>
+</html>
