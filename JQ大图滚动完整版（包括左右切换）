@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+<style type="text/css">
+#wrap {
+	width: 300px;
+	height: 200px;
+	background-color: #ccc;
+	position: relative;
+	overflow: hidden;
+}
+#child{
+	width: 9999px;
+	position: absolute;
+}
+#child img{
+	width: 300px;
+	height: 200px;
+	font-size: 70px;
+	color: yellow;
+	background-color: #ccc;
+	float: left;
+}	
+</style>
+</head>
+<body>
+<input type="button" value="上一步" id="last">
+<input type="button" value="下一步" id="next">
+<div id="wrap">
+	<div id="child">
+		<img src="http://www.7wanl.com/data/attachment/portal/201611/22/150741xlq2crzukr47k2xp.jpg.max.jpg" alt="">
+		<img src="http://www.7wanl.com/data/attachment/portal/201611/22/135239afw3kco4haqcc4ar.jpg.max.jpg" alt="">
+		<img src="http://www.7wanl.com/data/attachment/portal/201611/22/113958mqdtoz9qog6tuqz2.jpg.max.jpg" alt="">
+		<img src="http://www.7wanl.com/data/attachment/portal/201611/22/171637pr98783r4l1yzj47.jpg.max.jpg" alt="">
+	</div>
+</div>
+<div id="con">
+	<input type="button" value="按钮1">
+	<input type="button" value="按钮2">
+	<input type="button" value="按钮3">
+	<input type="button" value="按钮4">
+</div>
+
+<script type="text/javascript" src="http://www.7wanl.com/static/7wanl_v1.1/js/jquery-1.11.3.min.js"></script>
+
+<script type="text/javascript">
+jQuery.extend({
+	run: function(moveParent,clickParent,oClick,prevClick,nextClick,during){
+
+		var $index = 0;
+
+		function move(){
+
+			$(moveParent).stop().animate({
+				left:-$index*$(moveParent).find('img:eq(0)').width()
+			});
+
+		}
+
+		function next(){
+
+			$index++;
+
+			if($index >= $(clickParent).find($(oClick)).length ){
+				$index=0;
+			} 
+
+			move();
+		}
+
+		function clearTimer(){
+
+			clearInterval(timer);
+
+			timer=setInterval(function (){
+				next();
+			},during)
+
+		}
+
+		var timer= setInterval(function (){
+			next();
+		},during);
+
+		$(clickParent).find($(oClick)).click(function (){
+			clearTimer();
+			$index = $(clickParent).find($(oClick)).index($(this));
+			move();
+		})
+
+		$(prevClick).click(function (){
+			clearTimer();
+			$index--;
+			if($index < 0){
+				$index = $(moveParent).find('img').length-1;
+			}
+
+			move();
+		});
+
+		$(nextClick).click(function() {
+			clearTimer();
+			next();
+		});
+	}
+});
+  
+$.run("#child","#con","input","#last","#next",3000);
+//如果第四第五个参数没有，请传空，例如：$.run("#child","#con","input","","",3000);
+//第一个参数： 图片父级
+//第二个参数： 按钮父级
+//第三个参数： 按钮对应元素：input li
+//第四个参数： “上一张”按钮
+//第五个参数： “下一张”按钮
+//第六个参数： 时间频率
+</script>
+</body>
+</html>
