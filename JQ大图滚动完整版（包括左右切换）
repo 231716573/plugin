@@ -47,73 +47,84 @@
 
 <script type="text/javascript">
 jQuery.extend({
-	run: function(moveParent,clickParent,oClick,prevClick,nextClick,during){
+    run: function(moveParent,clickParent,prevClick,nextClick,clickClass,during){
 
-		var $index = 0;
+        //初始化按钮个数
+        for(var l=0;l<$(moveParent).find('img').length;l++){
+            $(clickParent).append("<input type='button' />")
+        }
+        $(clickParent).find('input:eq(0)').addClass(clickClass);
 
-		function move(){
 
-			$(moveParent).stop().animate({
-				left:-$index*$(moveParent).find('img:eq(0)').width()
-			});
+        var $index = 0;
+        // 大图滚动
+        function move(){
+            // 图片父级滚动
+            $(moveParent).stop().animate({
+                left:-$index*$(moveParent).find('img:eq(0)').width()
+            });
+            // 当前按钮加颜色class
+            $(clickParent).find("input").removeClass(clickClass)
+            $(clickParent).find("input").eq($index).addClass(clickClass)
+        }
 
-		}
+        // 下一个
+        function next(){
+            $index++;
 
-		function next(){
+            if($index >= $(clickParent).find("input").length ){
+                $index=0;
+            } 
+            move();
+        }
 
-			$index++;
+        // 定时
+        function clearTimer(){
+            clearInterval(timer);
 
-			if($index >= $(clickParent).find($(oClick)).length ){
-				$index=0;
-			} 
+            timer=setInterval(function (){
+                next();
+            },during)
 
-			move();
-		}
+        }
 
-		function clearTimer(){
+        // 初始化定时
+        var timer= setInterval(function (){
+            next();
+        },during);
 
-			clearInterval(timer);
+        //按钮点击
+        $(clickParent).find("input").click(function (){
+            clearTimer();
+            $index = $(clickParent).find("input").index($(this));
+            $(clickParent).find("input").removeClass(clickClass)
+            $(this).addClass(clickClass)
+            move();
+        })
+        // 上一个点击按钮
+        $(prevClick).click(function (){
+            clearTimer();
+            $index--;
+            if($index < 0){
+                $index = $(moveParent).find('img').length-1;
+            }
 
-			timer=setInterval(function (){
-				next();
-			},during)
-
-		}
-
-		var timer= setInterval(function (){
-			next();
-		},during);
-
-		$(clickParent).find($(oClick)).click(function (){
-			clearTimer();
-			$index = $(clickParent).find($(oClick)).index($(this));
-			move();
-		})
-
-		$(prevClick).click(function (){
-			clearTimer();
-			$index--;
-			if($index < 0){
-				$index = $(moveParent).find('img').length-1;
-			}
-
-			move();
-		});
-
-		$(nextClick).click(function() {
-			clearTimer();
-			next();
-		});
-	}
+            move();
+        });
+        // 下一个点击按钮
+        $(nextClick).click(function() {
+            clearTimer();
+            next();
+        });
+    }
 });
-  
-$.run("#child","#con","input","#last","#next",3000);
-//如果第四第五个参数没有，请传空，例如：$.run("#child","#con","input","","",3000);
+$.run(".child1",".con1","","","active",3000);
+//如果第三第四第五个参数没有，请传空，例如：$.run(".child1",".con1","","","active",3000);
 //第一个参数： 图片父级
 //第二个参数： 按钮父级
-//第三个参数： 按钮对应元素：input li
-//第四个参数： “上一张”按钮
-//第五个参数： “下一张”按钮
+//第三个参数： “上一张”按钮
+//第四个参数： “下一张”按钮
+//第五个参数： 按钮添加class
 //第六个参数： 时间频率
 </script>
 </body>
